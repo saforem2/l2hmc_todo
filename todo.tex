@@ -1,0 +1,110 @@
+\documentclass[11pt]{article}
+\usepackage{enumitem,amssymb,amsmath}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{pifont}
+%\usepackage{fancyhdr}
+\pagestyle{plain}
+\markright{\hfill\today}
+
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
+\hspace{-2.5pt}}
+\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
+%\setlength{\headheight}{15.2pt}
+%\pagestyle{fancy}
+%\pagestyle{headings}
+%\rhead{\today}{\today}
+%\markright{Sam Foreman\hfill \today}
+%\pagestyle{plain}
+%\fancyhf{}
+%\lhead{ \plain{}{L2HMC Algorithm} }
+%\rhead{ \plain{}{\today} }
+%\cfoot{ \plain{}{\thepage} }
+
+
+\hypersetup{
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+
+\begin{document}
+\noindent
+\textbf{\textcolor{red}{\huge TODO}}\\
+\noindent\rule{10cm}{0.4pt}\hfill\textit{(Edited: \today)}
+%\begin{itemize}
+%    \item \textit{\large New items (added 09/11/2019):}
+\begin{todolist}
+    \item Monitor tunneling rate during training.
+    \item Try increasing the batch size.
+    \item Try changing the number of leapfrog steps.
+    \item Try different annealing schedule.
+    \item Modify the \textbf{loss function} as follows:
+    \begin{enumerate}
+        \item Let $\Lambda \equiv \Lambda(\xi, \xi^{\prime}) = \delta(\xi^{\prime},
+            \xi) A(\xi^{\prime} | \xi)$, where $\delta(\xi^{\prime}, \xi) = \|x - x^{\prime}\|_{2}^{2}$
+        \item In terms of $\Lambda$, we can write the
+            $\ell_{\lambda}(\xi, \xi^{\prime}, A(\xi^{\prime}|\xi))$ (Eq. 7 from
+            the L2HMC paper) as 
+            \begin{equation}
+                \ell_{\lambda}(\xi, \xi^{\prime}, A(\xi^{\prime}|\xi)) =
+                    \frac{\lambda^{2}}{\Lambda(\xi, \xi^{\prime})} - \frac{\Lambda(\xi,
+                    \xi^{\prime})}{\lambda^{2}}.
+            \end{equation}
+        \item We are interested to see how the model behaves if we replace
+            $\ell_{\lambda}$ with a quadratic gaussian, $\eta_{\lambda}$:
+            \begin{equation}
+                \ell_{\lambda}{(\xi, \xi^{\prime})} 
+                \,\,\longrightarrow \,\,\eta_{\lambda}(\xi, \xi^{\prime}) 
+                    \equiv \exp\left[\frac{{(\Lambda -
+                \Lambda_0)}^{T}{(\Lambda - \Lambda_0)}}{2\, \sigma_{\Lambda}^{2}}\right] 
+            \end{equation}
+            where $\Lambda_0$ is a parameter related to the ``average distance''
+            between the initial and proposed configuration and
+            $\sigma_{\Lambda}^{2}$ controls the width of the Gaussian.
+      \end{enumerate}
+\end{todolist}
+%\rule{\textwidth}{0.2pt}
+%\noindent\rule{\hfill}{0.4pt}\hfill%\textit{(Added 09/11/2019)}
+    
+    %\item \textit{\large Previous items:}
+\begin{todolist}
+    \item Get a reasonable estimate of the \textbf{integrated
+      autocorrelation length}.
+    \item Look at \href{https://arxiv.org/pdf/1206.1901.pdf}{Neal's} proof and see if there's anything in the L2HMC algorithm that might violate reversibility.
+    \item Try reducing the step size $\varepsilon$ during inference by some multiplicative factor $\varepsilon \rightarrow \alpha \cdot \varepsilon$ so that the acceptance probability $p_x \rightarrow 1$.
+    \begin{itemize}
+        \item In doing so we need to increase the number of run steps by $1/\alpha$.
+      \item See if the bias in the average plaquette scales with $\varepsilon^2$.
+    \end{itemize}
+    \item Try and figure out why the Jacobian isn’t (\emph{exactly}) the same for the forward and backward updates.
+    \item Try removing the forward/backward masks during inference (i.e.\ run strictly forward or run strictly backward)
+    \item Try eliminating either the first $x$ update (i.e. $x \rightarrow
+      x^{\prime}$) or second $x$ update ($x^{\prime} \rightarrow
+      x^{\prime\prime}$) when running inference by setting either
+      $m^{t} = [1, 1, \ldots, 1]$ and $\bar{m}^{t} = [0, 0, \ldots, 0]$ or
+      vice versa (i.e.\  removing the mask when running inference).
+\end{todolist}
+
+\vspace{1cm}
+\noindent
+\textbf{\textcolor{blue}{\huge Completed:}}\\
+\begin{todolist}
+    \item[\done] Implement reversibility checker that ensures that the reversibility condition holds (for both position and momentum)
+    \item[\done] Try with `float64`. (\textbf{\textcolor{red}{Error still present.}})
+    \item[\done] Try as few as 10 hidden nodes and see if the error persists. (\textbf{\textcolor{red}{It does.}})
+        \item[\done] Try anti-symmetric Gaussian Mixture Model and see if the trained model is an accurate representation of the target distribution (e.g. by looking at the locations of the means) \href{https://l2hmc.slack.com/archives/CK0SMC6NS/p1567623563026900}{(link to post)}.
+    \item[\done] Loop over 
+        \verb+net_weights = [scale_w, translation_w, transformation_w]+
+    from $[0, 0, 0]$ up to $[2, 0, 0]$, $[0, 2, 0]$, $[0, 0, 2]$, and see how the error in the average plaquette changes \href{https://l2hmc.slack.com/archives/ck0smc6ns/p1567036227006600}{(link to post)}.
+\end{todolist}
+\end{document}
