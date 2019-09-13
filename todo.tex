@@ -39,8 +39,29 @@
 
 \begin{document}
 \noindent
-\textbf{\textcolor{red}{\huge TODO}}\\
-\noindent\rule{10cm}{0.4pt}\hfill\textit{(Edited: \today)}
+So following James’ suggestion to modify the loss function to use a Gaussian
+\begin{equation}
+\eta_{\lambda}(\Lambda; \Lambda_{0}, \sigma_{\Lambda}) =
+    \frac{\lambda}{\sqrt{2 \pi \sigma_{\Lambda}^{2}}}
+        \exp\left[\frac{(\Lambda - \Lambda_{0})^{2}}{2\sigma_{\Lambda}}\right],
+\end{equation}
+where    
+\begin{equation}
+    \Lambda \equiv \Lambda(\xi, \xi^{\prime}) = \delta(\xi, \xi^{\prime}) A(\xi^{\prime}|\xi),
+\end{equation}
+and    
+\begin{equation}
+    \delta(\xi, \xi^{\prime}) = \|x - x^{\prime}\|_{2}^{2}
+\end{equation}
+The total loss is then computed by averaging $\eta_{\lambda}(\Lambda; \Lambda_{0}, \sigma_{\Lambda})$ over all chains.
+\newline
+\noindent\rule{4cm}{0.4pt}
+\newline
+\newline
+\newline
+\noindent
+\textbf{\textcolor{red}{\huge TODO:}}\\
+%\noindent\rule{10cm}{0.4pt}\hfill\textit{(Edited: \today)}
 %\begin{itemize}
 %    \item \textit{\large New items (added 09/11/2019):}
 \begin{todolist}
